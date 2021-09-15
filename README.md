@@ -12,6 +12,7 @@ This example is taken from `molecule/default/converge.yml` and is tested on each
 ```yaml
 ---
 - name: Converge
+  mode: tcp
   hosts: all
   become: yes
   gather_facts: yes
