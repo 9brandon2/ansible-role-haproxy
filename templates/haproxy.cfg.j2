@@ -38,7 +38,9 @@ listen stats
 {% for frontend in haproxy_frontends %}
 frontend {{ frontend.name }}
     bind {{ frontend.address }}:{{ frontend.port }}{% if frontend.ssl is defined and frontend.ssl == true %} ssl{% endif %}{% if frontend.crts is defined and frontend.crts | length >0 %}{% for crt in frontend.crts %} crt {{ crt }}{% endfor %}{% endif %}
-    mode  tcp
+{% if frontend.mode %}
+    mode  {{ frontend.mode }}
+{% endfor %}
     default_backend {{ frontend.default_backend }}
 
 {% endfor %}
@@ -46,7 +48,9 @@ frontend {{ frontend.name }}
 backend {{ backend.name }}
 {% if backend.httpcheck %}
     option httpchk {% if backend.httpcheck_method is defined %}{{ backend.httpcheck_method }}{% endif %}{% endif %}
-    mode  tcp
+{% if backend.mode %}
+    mode  {{ backend.mode }}
+{% endfor %}
     balance {{ backend.balance | default(haproxy_backend_default_balance) }}
 {% for server in backend.servers %}
     server {{ server }} {{ hostvars[server]['ansible_default_ipv4']['address'] }}:{{ backend.port }} {{ backend.options | join(' ') }}
